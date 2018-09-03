@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 import cc.mrbird.common.annotation.ExportConfig;
+import cc.mrbird.common.annotation.Log;
 
 @Table(name = "t_job")
 public class Job implements Serializable {
