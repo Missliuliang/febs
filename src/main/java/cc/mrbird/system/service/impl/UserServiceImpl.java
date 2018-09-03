@@ -3,8 +3,10 @@ package cc.mrbird.system.service.impl;
 import cc.mrbird.common.service.impl.BaseServiceImpl;
 import cc.mrbird.system.dao.UserMapper;
 import cc.mrbird.system.dao.UserRoleMapper;
+import cc.mrbird.system.domain.Role;
 import cc.mrbird.system.domain.User;
 import cc.mrbird.system.domain.UserWithRole;
+import cc.mrbird.system.service.UserRoleService;
 import cc.mrbird.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,9 +27,20 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     @Autowired
     private UserRoleMapper userRoleMapper;
 
+    @Autowired
+    private UserRoleService userRoleService;
+
     @Override
     public UserWithRole findById(Long userId) {
-        return null;
+       List<UserWithRole> list= userMapper.findUserWithRole (userId);
+       List<Long> roleList=new ArrayList<> ();
+       list.forEach (userWithRole -> {
+           roleList.add (userWithRole.getRoleId ());
+       });
+       if(list.size ()==0) return  null;
+       UserWithRole uwr= list.get (0);
+       uwr.setRoleIds (roleList);
+       return  uwr;
     }
 
     @Override

@@ -1,19 +1,23 @@
 package cc.mrbird.common.service.impl;
 
+
 import cc.mrbird.common.service.IService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.Example;
+import cc.mrbird.common.service.IService;
 
 import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS ,isolation = Isolation.DEFAULT ,readOnly = true ,rollbackFor = Exception.class)
 public abstract class BaseServiceImpl<T> implements IService<T> {
+
 
     @Autowired
     Mapper mapper;

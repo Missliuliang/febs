@@ -1,6 +1,9 @@
 package cc.mrbird.common.service;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
+
 
 public interface IService<T> {
 

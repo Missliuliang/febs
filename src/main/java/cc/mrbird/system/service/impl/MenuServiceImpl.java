@@ -5,6 +5,7 @@ import cc.mrbird.common.service.impl.BaseServiceImpl;
 import cc.mrbird.system.dao.MenuMapper;
 import cc.mrbird.system.domain.Menu;
 import cc.mrbird.system.service.MenuService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +18,7 @@ import java.util.List;
 @Transactional(propagation = Propagation.SUPPORTS ,isolation = Isolation.DEFAULT ,readOnly = true ,rollbackFor = Exception.class)
 public class MenuServiceImpl extends BaseServiceImpl<Menu> implements MenuService {
 
+    @Autowired
     private MenuMapper menuMapper;
 
     @Override

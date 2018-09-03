@@ -2,7 +2,6 @@ package cc.mrbird.common.aspect;
 
 import cc.mrbird.common.annotation.Log;
 import cc.mrbird.common.config.FebsProperies;
-import cc.mrbird.common.util.HttpContextUtils;
 import cc.mrbird.common.util.IPUtils;
 import cc.mrbird.system.domain.SysLog;
 import cc.mrbird.system.domain.User;
@@ -18,9 +17,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -72,9 +71,9 @@ public class LogAspect {
             }
             sysLog.setParams(params.toString());
         }
-       /* ServletRequestAttributes attributes =(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();*/
-        HttpServletRequest request = HttpContextUtils.getServletRequest();
+       ServletRequestAttributes attributes =(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        //HttpServletRequest request = HttpContextUtils.getServletRequest();
         sysLog.setIp(IPUtils.getIpAddr(request));
         sysLog.setUsername(user.getUsername());
         sysLog.setCreateTime(new Date());
