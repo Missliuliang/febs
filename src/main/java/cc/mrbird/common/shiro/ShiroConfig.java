@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +46,6 @@ public class ShiroConfig {
 
 
     //设置redis
-    @Bean
     public RedisManager redisManager(){
         RedisManager manager=new RedisManager();
         manager.setHost(host);
@@ -56,7 +56,6 @@ public class ShiroConfig {
     }
 
     //redis 缓存的实现
-    @Bean
     public RedisCacheManager cacheManager(){
         RedisCacheManager cacheManager=new RedisCacheManager();
         cacheManager.setRedisManager(redisManager());
@@ -110,12 +109,14 @@ public class ShiroConfig {
     }
 
     @Bean
+    @Primary
     public ShiroRealm shiroRealm(){
         return  new ShiroRealm();
     }
 
 
     @Bean
+    @Primary
     public SecurityManager securityManager(){
         DefaultWebSecurityManager manager =new DefaultWebSecurityManager();
         manager.setRealm(shiroRealm ());
@@ -127,6 +128,7 @@ public class ShiroConfig {
 
 
     @Bean
+    @Primary
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilter =new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
