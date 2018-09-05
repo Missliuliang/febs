@@ -29,7 +29,7 @@ public class Role implements Serializable {
 	private String remark;
 
 	@Column(name = "CREATE_TIME")
-	@ExportConfig(value = "创建时间", convert = "c:cc.mrbird.common.util.poi.convert.TimeConvert")
+	@ExportConfig(value = "创建时间", convert = "c:TimeConvert")
 	private Date createTime;
 
 	@Column(name = "MODIFY_TIME")

@@ -67,7 +67,7 @@ public class User implements Serializable {
 	private String status = STATUS_VALID;
 
 	@Column(name = "CRATE_TIME")
-	@ExportConfig(value = "创建时间", convert = "c:cc.mrbird.common.util.poi.convert.TimeConvert")
+	@ExportConfig(value = "创建时间", convert = "c:TimeConvert")
 	private Date crateTime;
 
 	@Column(name = "MODIFY_TIME")

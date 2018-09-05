@@ -1,4 +1,4 @@
-package cc.mrbird.common.util.poi.pojo;
+package cc.mrbird.common.poi.pojo;
 
 public class ExportItem {
 

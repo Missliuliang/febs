@@ -46,7 +46,7 @@ public class SysLog implements Serializable {
 	private String ip;
 
 	@Column(name = "CREATE_TIME")
-	@ExportConfig(value = "操作时间", convert = "c:cc.mrbird.common.util.poi.convert.TimeConvert")
+	@ExportConfig(value = "操作时间", convert = "c:TimeConvert")
 	private Date createTime;
 
 	@Column(name = "LOCATION")

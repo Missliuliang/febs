@@ -1,4 +1,4 @@
-package cc.mrbird.common.util.poi.utils;
+package cc.mrbird.common.poi.utils;
 
 public class Constant {
     static final String XLSX_SUFFIX = ".xlsx";
