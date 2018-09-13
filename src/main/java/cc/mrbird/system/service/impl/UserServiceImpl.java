@@ -1,6 +1,6 @@
 package cc.mrbird.system.service.impl;
 
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.dao.UserMapper;
 import cc.mrbird.system.dao.UserRoleMapper;
 import cc.mrbird.system.domain.Role;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.DEFAULT , readOnly = true ,rollbackFor = Exception.class)
-public class UserServiceImpl extends BaseServiceImpl<User> implements UserService {
+public class UserServiceImpl extends BaseService<User> implements UserService {
 
     @Autowired
     private UserMapper userMapper;

@@ -4,6 +4,7 @@ import cc.mrbird.common.annotation.ExportConfig;
 import cc.mrbird.common.handler.ExportHandler;
 import cc.mrbird.common.poi.convert.ExportConvert;
 import cc.mrbird.common.poi.pojo.ExportItem;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -28,8 +29,10 @@ public class ExcelUtils {
 
     private HttpServletResponse mResponse;
 
+    // 分Sheet机制：每个Sheet最多多少条数据
     private Integer mMaxSheetRecords=10000;
 
+    //缓存数据格式器实例,避免多次使用反射进行实例化
     private Map<String , ExportConvert> mConvertInstanceCache =new HashMap<>();
 
     private ExcelUtils(Class<?> clazz){
@@ -66,6 +69,35 @@ public class ExcelUtils {
         }
     }
 
+    private String convertValue(Object oldValue ,String format){
+        try {
+            String  protocol=format.split(":")[0];
+            if ("s".equalsIgnoreCase(protocol)){
+                String[] pattern= format.split(":")[1].split(",");
+                for (String p:pattern){
+                    String[] cp= p.split("=");
+                    if (cp[0].equals(oldValue)) return cp[1];
+                }
+            }
+            if ("c".equalsIgnoreCase(protocol)){
+                String clazz=protocol.split(":")[1];
+                ExportConvert exportConvert=mConvertInstanceCache.get(clazz);
+                if (exportConvert==null){
+                    exportConvert=(ExportConvert) Class.forName(clazz).newInstance();
+                    mConvertInstanceCache.put(clazz,exportConvert);
+                }
+                if (mConvertInstanceCache.size()>10){
+                    mConvertInstanceCache.clear();
+                    return  exportConvert.handler(oldValue);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  String.valueOf(oldValue);
+    }
+
     public boolean toExcel(List<?> data, String sheetName){
         required_BuilderParams();
         try{
@@ -81,6 +113,7 @@ public class ExcelUtils {
         if (data ==null || data.size()<1) return  false;
         ExportConfig exportConfig;
         ExportItem exportItem;
+        // 导出列查询。
         List<ExportItem> exportItemList=new ArrayList<>();
         for (Field field: mClass.getDeclaredFields()) {
             exportConfig = field.getAnnotation(ExportConfig.class);
@@ -95,22 +128,66 @@ public class ExcelUtils {
                 exportItemList.add(exportItem);
             }
         }
+        // 创建新的工作薄。
         SXSSFWorkbook sxssfWorkbook =new SXSSFWorkbook();
         double sheetNo = Math.ceil(data.size() / mMaxSheetRecords);// 取出一共有多少个sheet.
+        // =====多sheet生成填充数据=====
         int index=0;
         while (index<=(sheetNo==0.0 ? sheetNo: sheetNo-1)){
             SXSSFSheet sheet =POIUtils.sxssfSheet(sxssfWorkbook ,sheetName+(index==0?"":"_"+index));
+            // 创建表头
             SXSSFRow headRow=POIUtils.sxssfRow(sheet,0);
             for (int i = 0; i <exportItemList.size() ; i++) {
                 SXSSFCell cell = POIUtils.sxssfCell(headRow, i);
                 POIUtils.setColumnWidth(sheet,i,exportItemList.get(i).getWidth(),exportItemList.get(i).getDisplay());
                 cell.setCellValue(exportItemList.get(i).getDisplay());
                 CellStyle cellStyle = exportHandler.headCellStyle(sxssfWorkbook);
+                if (cellStyle !=null ){
+                    cell.setCellStyle(cellStyle);
+                }
             }
+            SXSSFRow bodyRow;
+            String cellValue;
+            SXSSFCell bodyCell;
+            CellStyle style=sxssfWorkbook.createCellStyle();
+            Font font = sxssfWorkbook.createFont();
+            style.setFont(font);
+
+            // 产生数据行
+            if (data.size()>0){
+                int startNo= index* mMaxSheetRecords;
+                int endNo =Math.min(startNo + mMaxSheetRecords , data.size());
+                int i =startNo;
+                while (i<endNo){
+                    bodyRow=POIUtils.sxssfRow(sheet,i+1-startNo);
+                    for (int j = 0; j < exportItemList.size(); j++) {
+                        cellValue=exportItemList.get(j).getReplace();
+                        if ("".equals(cellValue)){
+                            try{
+                                cellValue= BeanUtils.getProperty(data.get(i) ,exportItemList.get(j).field);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        if (!"".equals(exportItemList.get(j).getConvert())){
+                            cellValue=convertValue(cellValue,exportItemList.get(j).getConvert());
+                        }
+                        POIUtils.setColumnWidth(sheet,j,exportItemList.get(j).getWidth(),cellValue);
+                        SXSSFCell sxssfCell = POIUtils.sxssfCell(bodyRow, j);
+                        sxssfCell.setCellValue("".equals(cellValue)?null:cellValue);
+                        sxssfCell.setCellStyle(style);
+                    }
+                    i++;
+                }
+            }
+            index++;
         }
-
-
-
+        try{
+            POIUtils.writeByLocalOrBrowser(mResponse,exportHandler.exportFileName(sheetName),sxssfWorkbook,out);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
         return true;
     }
 
@@ -139,5 +216,6 @@ public class ExcelUtils {
             }
         } ,out );
     }
+
 
 }

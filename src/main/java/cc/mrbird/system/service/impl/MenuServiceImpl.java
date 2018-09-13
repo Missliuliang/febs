@@ -1,7 +1,7 @@
 package cc.mrbird.system.service.impl;
 
 import cc.mrbird.common.domain.Tree;
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.dao.MenuMapper;
 import cc.mrbird.system.domain.Menu;
 import cc.mrbird.system.service.MenuService;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS ,isolation = Isolation.DEFAULT ,readOnly = true ,rollbackFor = Exception.class)
-public class MenuServiceImpl extends BaseServiceImpl<Menu> implements MenuService {
+public class MenuServiceImpl extends BaseService<Menu> implements MenuService {
 
     @Autowired
     private MenuMapper menuMapper;

@@ -2,7 +2,6 @@ package cc.mrbird.common.shiro;
 
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import cc.mrbird.common.config.FebsProperies;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
@@ -10,6 +9,11 @@ import org.apache.shiro.session.SessionListener;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.AnonymousFilter;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.filter.authc.LogoutFilter;
+import org.apache.shiro.web.filter.authc.UserFilter;
+import org.apache.shiro.web.filter.authz.RolesAuthorizationFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -20,40 +24,29 @@ import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import javax.servlet.Filter;
+import java.util.*;
 
 @Configuration
 public class ShiroConfig {
-
-    @Autowired
-    private FebsProperies febsProperies;
-
-    @Value("${spring.redis.host}")
-    private  String host;
-
-    @Value("${spring.redis.port}")
-    private int port ;
-
-    @Value("${spring.redis.timeout}")
-    private int timeout;
-
 
 
     //设置redis
     public RedisManager redisManager(){
         RedisManager manager=new RedisManager();
-        manager.setHost(host);
-        manager.setPort(port);
-        manager.setTimeout(timeout);
-       // manager.setExpire(febsProperies.getShiro().getExpireIn());
+
+        manager.setHost("111.231.66.170");
+        manager.setPort(6379);
+        manager.setTimeout(5000);
+
         return  manager;
     }
+
 
     //redis 缓存的实现
     public RedisCacheManager cacheManager(){
@@ -63,7 +56,6 @@ public class ShiroConfig {
 //        cacheManager.setValueSerializer(new StringSerializer());
         return  cacheManager;
     }
-
     @Bean
     public RedisSessionDAO redisSessionDAO(){
         RedisSessionDAO dao =new RedisSessionDAO();
@@ -76,7 +68,7 @@ public class ShiroConfig {
         DefaultWebSessionManager sessionManager =new DefaultWebSessionManager();
         Collection<SessionListener> listeners=new ArrayList<>();
         listeners.add(new ShiroSessionListener());
-        sessionManager.setGlobalSessionTimeout(febsProperies.getShiro().getSessionTimeout());
+        sessionManager.setGlobalSessionTimeout(10000);
         sessionManager.setSessionListeners(listeners);
         sessionManager.setSessionDAO(redisSessionDAO());
         return  sessionManager;
@@ -87,10 +79,9 @@ public class ShiroConfig {
      *
      * @return SimpleCookie
      */
-    @Bean
     public SimpleCookie rememberMecookie(){
         SimpleCookie simpleCookie=new SimpleCookie("rememberMe");
-        simpleCookie.setMaxAge(febsProperies.getShiro().getCookieTimeout());
+        simpleCookie.setMaxAge(86400);
         return  simpleCookie;
     }
 
@@ -99,13 +90,12 @@ public class ShiroConfig {
      *
      * @return CookieRememberMeManager
      */
-    @Bean
     public CookieRememberMeManager rememberMeManager(){
-        CookieRememberMeManager rememberMeManager =new CookieRememberMeManager();
-        rememberMeManager.setCookie(rememberMecookie());
+        CookieRememberMeManager MeManager =new CookieRememberMeManager();
+        MeManager.setCookie(rememberMecookie());
         // rememberMe cookie 加密的密钥
-        rememberMeManager.setCipherKey(Base64.decode("4AvVhmFLUs0KTA3Kprsdag=="));
-        return  rememberMeManager;
+        MeManager.setCipherKey(Base64.decode("4AvVhmFLUs0KTA3Kprsdag=="));
+        return  MeManager;
     }
 
     @Bean
@@ -132,19 +122,28 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager){
         ShiroFilterFactoryBean shiroFilter =new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
-        shiroFilter.setLoginUrl(febsProperies.getShiro().getLoginUrl());
-        shiroFilter.setSuccessUrl(febsProperies.getShiro().getSuccessUrl());
-        shiroFilter.setUnauthorizedUrl(febsProperies.getShiro().getUnauthorizedUrl());
+        shiroFilter.setLoginUrl("/login");
+        shiroFilter.setSuccessUrl("/index");
+        shiroFilter.setUnauthorizedUrl("/403");
+        Map<String , Filter> filterMap =new HashMap<>();
+        filterMap.put("anno" ,new AnonymousFilter());
+        filterMap.put("anthc" ,new FormAuthenticationFilter());
+        filterMap.put("logout" ,new LogoutFilter());
+        filterMap.put("role" ,new RolesAuthorizationFilter());
+        filterMap.put("user" ,new UserFilter());
+        shiroFilter.setFilters(filterMap);
+
 
 
         LinkedHashMap<String ,String> filterChainDefinitionMap =new LinkedHashMap<>();
         // 设置免认证 url
-        String[] anonUrls = StringUtils.splitByWholeSeparatorPreserveAllTokens(febsProperies.getShiro().getAnonUrl(), ",");
+        String urlconf="/css/**,/js/**,/fonts/**,/img/**,/druid/**,/user/regist,/gifCode,/";
+        String[] anonUrls = StringUtils.splitByWholeSeparatorPreserveAllTokens(urlconf, ",");
         for (String url : anonUrls){
             filterChainDefinitionMap.put(url,"anno");
         }
         // 配置退出过滤器，其中具体的退出代码 Shiro已经替我们实现了
-        filterChainDefinitionMap.put(febsProperies.getShiro().getLogoutUrl(),"logout");
+        filterChainDefinitionMap.put("/logout","logout");
         // 除上以外所有 url都必须认证通过才可以访问，未通过认证自动访问 LoginUrl
         filterChainDefinitionMap.put("/**" ,"user");
         shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);

@@ -1,6 +1,5 @@
 package cc.mrbird.common.shiro;
 
-import cc.mrbird.common.config.FebsProperies;
 import cc.mrbird.common.xss.XssFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,7 @@ import java.util.Map;
 @Configuration
 public class WebConfig {
 
-    @Autowired
-    private FebsProperies febsProperies;
+
 
     @Bean
     public FilterRegistrationBean xxsFilterRegistrationBean(){
@@ -35,7 +33,7 @@ public class WebConfig {
     @Bean
     public ObjectMapper objectMapper(){
         ObjectMapper objectMapper =new ObjectMapper();
-        objectMapper.setDateFormat(new SimpleDateFormat(febsProperies.getTimeFormat()));
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         return  objectMapper;
     }
 }

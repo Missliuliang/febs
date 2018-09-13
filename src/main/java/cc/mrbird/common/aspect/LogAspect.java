@@ -1,16 +1,16 @@
 package cc.mrbird.common.aspect;
 
 import cc.mrbird.common.annotation.Log;
-import cc.mrbird.common.config.FebsProperies;
 import cc.mrbird.common.util.IPUtils;
 import cc.mrbird.system.domain.SysLog;
 import cc.mrbird.system.domain.User;
 import cc.mrbird.system.service.LogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -26,21 +26,36 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-@Aspect
+
 @Component
+@Aspect
 public class LogAspect {
 
     @Autowired
     private LogService logService ;
-
     @Autowired
-    private FebsProperies febsProperies;
-
     private ObjectMapper mapper;
 
 
     @Pointcut("@annotation(cc.mrbird.common.annotation.Log)")
     public void pointCut(){}
+
+
+   @Around("pointCut()")
+    public Object useTime(ProceedingJoinPoint joinPoint)throws  Exception{
+            Object result =null;
+            long beginTime=System.currentTimeMillis();
+            try {
+                // 执行方法
+                result = joinPoint.proceed();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            long useTime=System.currentTimeMillis()-beginTime ;
+            saveLog(joinPoint,useTime);
+            return result;
+    }
+
 
     public void saveLog(ProceedingJoinPoint joinPoint ,long time)throws Exception{
         User user= (User) SecurityUtils.getSubject().getPrincipal();
@@ -49,7 +64,6 @@ public class LogAspect {
         SysLog sysLog=new SysLog();
         Log annotation = method.getAnnotation(Log.class);
         if(annotation !=null){
-
             sysLog.setOperation(annotation.value());
         }
         String name = joinPoint.getTarget().getClass().getName();

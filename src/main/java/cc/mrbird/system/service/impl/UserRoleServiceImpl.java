@@ -1,6 +1,6 @@
 package cc.mrbird.system.service.impl;
 
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.service.UserRoleService;
 import cc.mrbird.system.domain.UserRole;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS  ,isolation = Isolation.DEFAULT ,readOnly = true ,rollbackFor = Exception.class)
-public class UserRoleServiceImpl extends BaseServiceImpl<UserRole> implements UserRoleService {
+public class UserRoleServiceImpl extends BaseService<UserRole> implements UserRoleService {
     @Override
     @Transactional
     public void deleteUserRoleByRoleId(String roleId) {

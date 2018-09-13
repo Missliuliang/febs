@@ -1,6 +1,6 @@
 package cc.mrbird.system.service.impl;
 
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.dao.RoleMapper;
 import cc.mrbird.system.dao.RoleMenuMapper;
 import cc.mrbird.system.dao.UserRoleMapper;
@@ -25,7 +25,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-public class RoleServiceImpl extends BaseServiceImpl<Role> implements RoleService {
+public class RoleServiceImpl extends BaseService<Role> implements RoleService {
 
     @Autowired
     RoleMapper roleMapper;

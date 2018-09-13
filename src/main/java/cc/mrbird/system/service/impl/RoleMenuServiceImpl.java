@@ -1,6 +1,6 @@
 package cc.mrbird.system.service.impl;
 
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.domain.RoleMenu;
 import cc.mrbird.system.service.RoleMenuService;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS ,isolation = Isolation.DEFAULT ,rollbackFor = Exception.class)
-public class RoleMenuServiceImpl extends BaseServiceImpl<RoleMenu> implements RoleMenuService {
+public class RoleMenuServiceImpl extends BaseService<RoleMenu> implements RoleMenuService {
     @Override
     @Transactional
     public void deleteRoleMenuByRoldId(String roleIds) {

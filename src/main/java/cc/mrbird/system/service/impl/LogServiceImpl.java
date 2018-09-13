@@ -1,6 +1,6 @@
 package cc.mrbird.system.service.impl;
 
-import cc.mrbird.common.service.impl.BaseServiceImpl;
+import cc.mrbird.common.service.impl.BaseService;
 import cc.mrbird.system.domain.SysLog;
 import cc.mrbird.system.service.LogService;
 import org.apache.commons.lang.StringUtils;
@@ -11,7 +11,7 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.Arrays;
 import java.util.List;
 @Service
-public class LogServiceImpl extends BaseServiceImpl<SysLog> implements LogService  {
+public class LogServiceImpl extends BaseService<SysLog> implements LogService  {
 
     @Override
     public List<SysLog> findAllLogs(SysLog log) {
