@@ -4,7 +4,9 @@ import cc.mrbird.common.annotation.ExportConfig;
 import cc.mrbird.common.handler.ExportHandler;
 import cc.mrbird.common.poi.convert.ExportConvert;
 import cc.mrbird.common.poi.pojo.ExportItem;
+import com.csvreader.CsvWriter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -15,9 +17,11 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,6 +194,62 @@ public class ExcelUtils {
         }
         return true;
     }
+
+
+
+    public boolean toCvs(List<?> data ,String path){
+        try {
+            required_BuilderParams();
+            if (data==null || data.size()<0)return  false;
+
+            ExportConfig exportConfig;
+            ExportItem exportItem=null;
+            List<ExportItem> list=new ArrayList<>();
+            for (Field field: mClass.getDeclaredFields()) {
+                exportConfig = field.getAnnotation(ExportConfig.class);
+                if (exportConfig!=null){
+                    exportItem=new ExportItem();
+                    exportItem.setField(field.getName());
+                    exportItem.setDisplay("field".equals(exportConfig.value())?field.getName():exportConfig.value());
+                    exportItem.setConvert(exportConfig.convert());
+                    exportItem.setReplace(exportConfig.replace());
+                    list.add(exportItem);
+                }
+            }
+            String cellValue = null;
+            FileOutputStream outputStream=new FileOutputStream(path);
+            outputStream.write(new byte[]{ (byte) 0xEF, (byte) 0xBB, (byte) 0xBF  });
+            CsvWriter csvWriter = new CsvWriter(outputStream, ',', Charset.forName("utf-8"));
+            String[] toArray = list.stream().map(ExportItem::getDisplay).toArray(String[]::new);
+            csvWriter.writeRecord(toArray);
+            for (Object  adata:data) {
+                List<Object> csvContent=new ArrayList<>();
+                for (ExportItem exportItem1 : list
+                     ) {
+                    cellValue=exportItem1.getReplace();
+                    if (!StringUtils.isNotBlank(cellValue)){
+                        try {
+                            cellValue=BeanUtils.getProperty(adata,exportItem.getField());
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    if (!StringUtils.isNotBlank(exportItem.getConvert())){
+                        cellValue=convertValue(cellValue,exportItem.getConvert());
+                    }
+                    csvContent.add(cellValue);
+                }
+                String[] array = csvContent.toArray(new String[0]);
+                csvWriter.writeRecord(array);
+            }
+            csvWriter.close();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return  false;
+        }
+    }
+
 
     public boolean toExcel(List<?> data , String sheetName , OutputStream out){
         return  toExcel(data, sheetName,new ExportHandler(){
