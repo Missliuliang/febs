@@ -75,11 +75,11 @@ public class MenuController extends BaseController {
         }
     }
 
-    @RequestMapping("/meun/getUserMenu")
+    @RequestMapping("getUserMenu")
     @ResponseBody
     public ResponseBo getUserMenu(String userName){
         try {
-            List<Menu> userMenu = this.menuService.getUserMenu(userName);
+            Tree<Menu> userMenu = this.menuService.getUserMenu(userName);
             return  ResponseBo.ok(userMenu);
         }catch (Exception e){
             e.printStackTrace();

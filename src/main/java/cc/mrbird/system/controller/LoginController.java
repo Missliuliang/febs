@@ -36,14 +36,15 @@ public class LoginController extends BaseController {
 
     @PostMapping("/login")
     @ResponseBody
-    public ResponseBo login(String username ,String password , String code ,boolean rememberMe){
-        if (!StringUtils.isNotBlank(code)) return ResponseBo.warn("验证码不能为空！");
+    public ResponseBo login(String username ,String password  ,boolean rememberMe){
+       // if (!StringUtils.isNotBlank(code)) return ResponseBo.warn("验证码不能为空！");
         Session session = super.getSession();
         String sessionCode = (String) session.getAttribute("_code");
-        session.removeAttribute(sessionCode);
-        if (!code.toLowerCase().equals(sessionCode))  return ResponseBo.warn("验证码错误！");
-        String encrypt = MD5Utils.encrypt(username.toLowerCase(), password);
-        UsernamePasswordToken token=new UsernamePasswordToken(username,encrypt,rememberMe);
+        session.removeAttribute("_code");
+       // if (!code.toLowerCase().equals(sessionCode))  return ResponseBo.warn("验证码错误！");
+        password = MD5Utils.encrypt(username, password);
+        System.out.println(password);
+        UsernamePasswordToken token=new UsernamePasswordToken(username,password,rememberMe);
         try {
             super.login(token);
             this.userService.updateLoginTime(username);
@@ -56,7 +57,7 @@ public class LoginController extends BaseController {
     }
 
 
-    @GetMapping("/gifCode")
+   /* @GetMapping("/gifCode")
     public void getGifCode(HttpServletResponse response , HttpServletRequest request){
         try{
             response.setHeader("Pragma" ,"no-cache");
@@ -71,7 +72,7 @@ public class LoginController extends BaseController {
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
+    }*/
 
     @RequestMapping("/")
     public String redirectIndex(){

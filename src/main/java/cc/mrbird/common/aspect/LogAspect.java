@@ -89,7 +89,9 @@ public class LogAspect {
         HttpServletRequest request = attributes.getRequest();
         //HttpServletRequest request = HttpContextUtils.getServletRequest();
         sysLog.setIp(IPUtils.getIpAddr(request));
-        sysLog.setUsername(user.getUsername());
+        if (user.getUsername()!=null) {
+            sysLog.setUsername(user.getUsername());
+        }
         sysLog.setCreateTime(new Date());
         sysLog.setLocation(request.getLocalAddr());
         this.logService.save(sysLog);

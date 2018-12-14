@@ -1,10 +1,12 @@
 package cc.mrbird.system.service.impl;
 
 import cc.mrbird.common.service.impl.BaseService;
+import cc.mrbird.common.util.MD5Utils;
 import cc.mrbird.system.dao.UserMapper;
 import cc.mrbird.system.dao.UserRoleMapper;
 import cc.mrbird.system.domain.Role;
 import cc.mrbird.system.domain.User;
+import cc.mrbird.system.domain.UserRole;
 import cc.mrbird.system.domain.UserWithRole;
 import cc.mrbird.system.service.UserRoleService;
 import cc.mrbird.system.service.UserService;
@@ -13,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -45,7 +49,14 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
 
     @Override
     public User findByName(String name) {
-        return null;
+        Example example=new Example(User.class);
+        example.createCriteria().andCondition("lower(username)=",name.toLowerCase());
+        List<User> users = userMapper.selectByExample(example);
+        if (users.size()==0){
+            return null;
+        }else {
+            return users.get(0);
+        }
     }
 
     @Override
@@ -55,7 +66,16 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
 
     @Override
     public void registUser(User user) {
-
+        user.setCrateTime(new Date());
+        user.setTheme(User.DEFAULT_THEME);
+        user.setAvatar(User.DEFAULT_AVATAR);
+        user.setSsex(User.SEX_UNKNOW);
+        user.setPassword(MD5Utils.encrypt(user.getUsername(),user.getPassword()));
+        this.save(user);
+        UserRole ur=new UserRole();
+        ur.setUserId(user.getUserId());
+        ur.setRoleId(3L);
+        this.userRoleMapper.insert(ur);
     }
 
     @Override

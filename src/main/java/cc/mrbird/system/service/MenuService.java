@@ -12,7 +12,7 @@ public interface MenuService extends IService<Menu> {
 
     List<Menu> findUserMenus(String userName);
 
-    List<Menu> getUserMenu(String userName);
+    Tree<Menu>  getUserMenu(String userName);
 
     List<Menu> findAllMenus(Menu menu);
 

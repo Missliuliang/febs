@@ -2,6 +2,7 @@ package cc.mrbird.system.service.impl;
 
 import cc.mrbird.common.domain.Tree;
 import cc.mrbird.common.service.impl.BaseService;
+import cc.mrbird.common.util.TreeUtils;
 import cc.mrbird.system.dao.MenuMapper;
 import cc.mrbird.system.domain.Menu;
 import cc.mrbird.system.service.MenuService;
@@ -32,7 +33,7 @@ public class MenuServiceImpl extends BaseService<Menu> implements MenuService {
     }
 
     @Override
-    public List<Menu> getUserMenu(String userName) {
+    public Tree<Menu> getUserMenu(String userName) {
         List<Tree<Menu>> trees=new ArrayList<>();
         List<Menu> userMenus = this.findUserMenus(userName);
         userMenus.forEach(menu -> {
@@ -44,8 +45,8 @@ public class MenuServiceImpl extends BaseService<Menu> implements MenuService {
             tree.setIcon(menu.getIcon());
             trees.add(tree);
         });
-
-        return null;
+        Tree<Menu> build = TreeUtils.build(trees);
+        return build;
     }
 
     @Override
@@ -65,7 +66,7 @@ public class MenuServiceImpl extends BaseService<Menu> implements MenuService {
 
     @Override
     public Menu findById(long menuId) {
-        return null;
+        return this.selectByKey(menuId);
     }
 
     @Override

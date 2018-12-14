@@ -30,8 +30,7 @@ function initTreeTable() {
                 field: 'createTime'
             }
         ]
-    };
-
+    }
     $MB.initTreeTable('deptTable', setting);
 }
 
@@ -41,7 +40,7 @@ function search() {
 
 function refresh() {
     $(".dept-table-form")[0].reset();
-    search();
+    initTreeTable();
     $MB.refreshJsTree("deptTree", createDeptTree());
 }
 
@@ -54,14 +53,14 @@ function deleteDepts() {
     }
     for (var i = 0; i < ids.length; i++) {
         ids_arr += ids[i].id;
-        if (i !== (ids.length - 1)) ids_arr += ",";
+        if (i != (ids.length - 1)) ids_arr += ",";
     }
     $MB.confirm({
         text: "确定删除选中部门？",
         confirmButtonText: "确定删除"
     }, function() {
         $.post(ctx + 'dept/delete', { "ids": ids_arr }, function(r) {
-            if (r.code === 0) {
+            if (r.code == 0) {
                 $MB.n_success(r.msg);
                 refresh();
             } else {
@@ -73,7 +72,7 @@ function deleteDepts() {
 
 function exportDeptExcel(){
 	$.post(ctx+"dept/excel",$(".dept-table-form").serialize(),function(r){
-		if (r.code === 0) {
+		if (r.code == 0) {
 			window.location.href = "common/download?fileName=" + r.msg + "&delete=" + true;
 		} else {
 			$MB.n_warning(r.msg);
@@ -83,7 +82,7 @@ function exportDeptExcel(){
 
 function exportDeptCsv(){
 	$.post(ctx+"dept/csv",$(".dept-table-form").serialize(),function(r){
-		if (r.code === 0) {
+		if (r.code == 0) {
 			window.location.href = "common/download?fileName=" + r.msg + "&delete=" + true;
 		} else {
 			$MB.n_warning(r.msg);

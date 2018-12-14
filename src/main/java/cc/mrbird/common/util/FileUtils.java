@@ -1,6 +1,7 @@
 package cc.mrbird.common.util;
 
 import cc.mrbird.common.domain.ResponseBo;
+import cc.mrbird.common.poi.utils.ExcelUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,13 +46,36 @@ public class FileUtils {
                     dirFile.mkdir();
                     String path="file/"+newfileName;
                     FileOutputStream outputStream=new FileOutputStream(path);
-
+                    operateSgin = ExcelUtils.builder(clazz).toExcel(list,"查询结果",outputStream);
                 }
             }catch (Exception e){
                 e.printStackTrace();
             }
+            if (operateSgin){
+                return  ResponseBo.ok(fileName);
+            }else {
+                return  ResponseBo.error("导出Excel失败，请联系网站管理员！");
+            }
         }
-        return  null ;
+    }
+    public static ResponseBo createCsv(String fileName ,List<?> data ,Class<?> clazz){
+         if (data.isEmpty()){
+             return  ResponseBo.warn("导出数据为空！");
+         } else {
+             boolean flag=false;
+             String newfileName= makeFileName(fileName+".csv");
+             File file=new File("file");
+             if (!file.exists()){
+                 file.mkdir();
+                 String path="file/"+newfileName;
+                 flag=ExcelUtils.builder(clazz).toCvs(data,path);
+             }
+             if (flag){
+                 return ResponseBo.ok(fileName);
+             }else {
+                 return ResponseBo.error("导出Csv失败，请联系网站管理员！");
+             }
+         }
     }
 
 

@@ -46,4 +46,9 @@ public class RedisConfig extends CachingConfigurerSupport {
             return new JedisPool(jedisPoolConfig, host, port, timeout);
     }
 
+    public static void main(String[] args) {
+        RedisConfig redisConfig=new RedisConfig();
+        System.out.println(redisConfig.redisPoolFactory().toString());
+    }
+
 }

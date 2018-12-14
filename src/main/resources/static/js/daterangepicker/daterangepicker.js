@@ -130,7 +130,7 @@
         this.container = $(options.template).appendTo(this.parentEl);
 
         //
-        // handler all the possible options overriding defaults
+        // handle all the possible options overriding defaults
         //
 
         if (typeof options.locale === 'object') {
