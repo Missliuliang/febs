@@ -84,7 +84,7 @@ public class ExcelUtils {
                 }
             }
             if ("c".equalsIgnoreCase(protocol)){
-                String clazz=protocol.split(":")[1];
+                String clazz=protocol.split(":")[0];
                 ExportConvert exportConvert=mConvertInstanceCache.get(clazz);
                 if (exportConvert==null){
                     exportConvert=(ExportConvert) Class.forName(clazz).newInstance();
