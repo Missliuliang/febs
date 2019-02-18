@@ -1,55 +1,110 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="edge" />
-    <title>FEBS权限管理系统</title>
-    <link rel="shortcut icon" type="image/png" th:href="@{/img/favicon.ico}" />
-    <link rel="stylesheet" th:href="@{css/login.css}" type="text/css">
-    <link rel="stylesheet" th:href="@{css/iCheck/minimal/green.css}" type="text/css">
-    <link rel="stylesheet" th:href="@{css/app.css}" type="text/css">
-    <!-- animate -->
-    <link rel="stylesheet" th:href="@{css/animate/animate.min.css}" type="text/css">
-    <script th:src="@{js/jquery.min.js}"></script>
-    <script th:src="@{js/iCheck/icheck.js}"></script>
-    <script th:src="@{js/bootstrap-notify/bootstrap-notify.min.js}"></script>
-    <script th:src="@{js/common.js}"></script>
+    <title>Title</title>
 </head>
-<style>
+<script src="${pageContext.request.contextPath }/js/jquery.min.js"></script>
 
-</style>
+<script >
+    function login() {
+        var username = document.getElementsByName("username").values();
+        var password =document.getElementsByName("password").values();
+        if (username == "") {
+            console.log("请输入用户名！");
+            return;
+        }
+        if (password == "") {
+            console.log("请输入密码！");
+            return;
+        }
+
+        $.ajax({
+            type: "post",
+            url: ctx + "login",
+            data: {
+                "username": username,
+                "password": password,
+            },
+            dataType: "json",
+            success: function(r) {
+                console.log(r.toString())
+                if (r.code == 0) {
+                    location.href = ctx + 'index';
+                } else {
+                    console.log(r.msg);
+                    $loginButton.html("登录");
+                }
+            }
+        });
+    }
+
+    function regist() {
+        var username = $(".two input[name='username']").val().trim();
+        var password = $(".two input[name='password']").val().trim();
+        var cpassword = $(".two input[name='cpassword']").val().trim();
+        if (username == "") {
+            console.log("用户名不能为空！");
+            return;
+        } else if (username.length > 10) {
+            console.log("用户名长度不能超过10个字符！");
+            return;
+        } else if (username.length < 3) {
+            console.log("用户名长度不能少于3个字符！");
+            return;
+        }
+        if (password == "") {
+            console.log("密码不能为空！");
+            return;
+        }
+        if (cpassword == "") {
+            console.log("请再次输入密码！");
+            return;
+        }
+        if (cpassword != password) {
+            console.log("两次密码输入不一致！");
+            return;
+        }
+        $.ajax({
+            type: "post",
+            url: ctx + "user/regist",
+            data: {
+                "username": username,
+                "password": password,
+            },
+            dataType: "json",
+            success: function (r) {
+                if (r.code == 0) {
+                    console.log("注册成功，请登录");
+                    $(".two input[name='username']").val("");
+                    $(".two input[name='password']").val("");
+                    $(".two input[name='cpassword']").val("");
+                    $('.form-toggle').trigger('click');
+                } else {
+                    console.log(r.msg);
+                }
+            }
+        });
+    }
+
+
+</script>
+
 <body>
-    <!-- Form-->
-    <div class="form">
-        <div class="form-toggle"></div>
-        <div class="form-panel one">
-            <div class="form-header">
-                <h1>账户登录</h1>
-            </div>
-            <div class="form-content">
-                <div class="form-group">
-                    <label for="username">用户名</label>
-                    <input type="text" name="username" />
-                </div>
-                <div class="form-group">
-                    <label for="password">密码</label>
-                    <input type="password" name="password" />
-                </div>
-             <!--   <div class="form-group" style="display:inline-block">
-                    <label for="code">验证码</label>
-                    <input type="text" name="code" style="width:50%; display:inline-block" />
-                    <img data-th-src="@{gifCode}" id="validateCodeImg" onclick="reloadCode()" style="display:inline-block" />
-                </div>-->
-                <div class="form-group" style="margin: 0px;">
-                    <p>
-                        <input type="checkbox" name="rememberme" />&nbsp;&nbsp;记住我</p>
-                </div>
-                <div class="form-group">
-                    <button onclick="login()" id="loginButton">登录</button>
-                </div>
-            </div>
-        </div>
+
+
+<!--   <div class="form-group" style="display:inline-block">
+       <label for="code">验证码</label>
+       <input type="text" name="code" style="width:50%; display:inline-block" />
+       <img data-th-src="@{gifCode}" id="validateCodeImg" onclick="reloadCode()" style="display:inline-block" />
+   </div>-->
+<p><input type="checkbox" name="rememberme" />&nbsp;&nbsp;记住我</p>
+<button onclick="login()" id="loginButton">登录</button>
+
+
+
+
+<!--
         <div class="form-panel two">
             <div class="form-header">
                 <h1>账户注册</h1>
@@ -72,11 +127,9 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div data-th-include="common/footer"></div>
+    </div>-->
+
+
+
 </body>
-<script th:inline="javascript">
-	var ctx = [[@{/}]];
-</script>
-<script data-th-src="@{js/app/login.js}"></script>
 </html>
