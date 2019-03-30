@@ -120,7 +120,7 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         this.updateNotNull(u);
         Example example=new Example(User.class);
         example.createCriteria().andCondition("user_id=",u.getUserId());
-        this.userMapper.deleteByExample(example);
+        this.userRoleMapper.deleteByExample(example);
         for (Long r:role
              ) {
             UserRole ur=new UserRole();

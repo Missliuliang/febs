@@ -22,9 +22,6 @@ import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,13 +33,16 @@ import java.util.*;
 public class ShiroConfig {
 
 
+
+
+
     //设置redis
     public RedisManager redisManager(){
         RedisManager manager=new RedisManager();
 
         manager.setHost("111.231.66.170");
         manager.setPort(6379);
-        manager.setTimeout(5000);
+        manager.setTimeout(100000);
 
         return  manager;
     }
@@ -115,7 +115,6 @@ public class ShiroConfig {
         manager.setSessionManager(sessionManager());
         return manager;
     }
-
 
     @Bean
     @Primary

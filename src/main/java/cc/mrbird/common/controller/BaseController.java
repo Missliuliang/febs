@@ -28,6 +28,7 @@ public class BaseController  {
     }
 
     public static Session getSession(){
+        System.err.println(getSubject().getSession().toString());
         return getSubject().getSession();
     }
 

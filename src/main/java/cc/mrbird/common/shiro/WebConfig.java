@@ -16,10 +16,10 @@ public class WebConfig {
 
 
 
-    @Bean
+   /* @Bean
     public FilterRegistrationBean xxsFilterRegistrationBean(){
         FilterRegistrationBean filterRegistrationBean =new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new XssFilter());
+        //filterRegistrationBean.setFilter(new XssFilter());
         filterRegistrationBean.setOrder(1);
         filterRegistrationBean.setEnabled(true);
         filterRegistrationBean.addUrlPatterns("/*");
@@ -28,7 +28,7 @@ public class WebConfig {
         initParameters.put("isIncludeRichText", "true");
         filterRegistrationBean.setInitParameters(initParameters);
         return  filterRegistrationBean;
-    }
+    }*/
 
     @Bean
     public ObjectMapper objectMapper(){

@@ -1,6 +1,7 @@
 package cc.mrbird.common.config;
 
 import org.apache.commons.lang.StringUtils;
+import org.crazycake.shiro.RedisManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;

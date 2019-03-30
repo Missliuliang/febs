@@ -11,6 +11,7 @@ import cc.mrbird.system.domain.User;
 import cc.mrbird.system.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,17 @@ public class UserController  extends BaseController {
     UserService userService;
 
     private static final  String ON="on";
+
+    @RequestMapping("user/checkUserName")
+    @ResponseBody
+    public boolean checkUserName(String username, String oldusername) {
+        if (StringUtils.isNotBlank(oldusername) && username.equalsIgnoreCase(oldusername)) {
+            return true;
+        }
+        User result = this.userService.findByName(username);
+        return result == null;
+    }
+
 
     @RequestMapping("user")
     @RequiresPermissions("user:list")
@@ -88,7 +100,7 @@ public class UserController  extends BaseController {
     }
 
     @Log("新增用户")
-    @RequestMapping("/user/addUser")
+    @RequestMapping("/user/add")
     @RequiresPermissions("user:add")
     @ResponseBody
     public ResponseBo  addUser(User user ,Long[] roles){
